@@ -25,17 +25,17 @@
 
 ## Tech Stack
 
-| Area | Technology |
-|---|---|
-| Framework | Next.js (App Router), React, TypeScript (strict mode) |
-| Styling | Tailwind CSS |
-| Database | PostgreSQL ([Neon](https://neon.tech)) with Prisma ORM |
-| Auth | Auth.js (Credentials + Google) |
-| Payments | Stripe Checkout + webhooks |
-| Email | Resend |
-| Validation | Zod on every form and API route |
-| Testing | Vitest (unit), Playwright (end-to-end) |
-| CI/CD | GitHub Actions, deployed on Vercel |
+| Area       | Technology                                             |
+| ---------- | ------------------------------------------------------ |
+| Framework  | Next.js (App Router), React, TypeScript (strict mode)  |
+| Styling    | Tailwind CSS                                           |
+| Database   | PostgreSQL ([Neon](https://neon.tech)) with Prisma ORM |
+| Auth       | Auth.js (Credentials + Google)                         |
+| Payments   | Stripe Checkout + webhooks                             |
+| Email      | Resend                                                 |
+| Validation | Zod on every form and API route                        |
+| Testing    | Vitest (unit), Playwright (end-to-end)                 |
+| CI/CD      | GitHub Actions, deployed on Vercel                     |
 
 ## Engineering Highlights
 
@@ -98,18 +98,18 @@ Pay test invoices with card `4242 4242 4242 4242`, any future expiry date, and a
 
 ### Environment Variables
 
-| Variable | Purpose |
-|---|---|
-| `DATABASE_URL` | Pooled Postgres connection string |
-| `DIRECT_URL` | Direct Postgres connection (used for migrations) |
-| `AUTH_SECRET` | Secret for signing Auth.js tokens |
-| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth credentials |
-| `STRIPE_SECRET_KEY` | Stripe API key (test mode) |
-| `STRIPE_WEBHOOK_SECRET` | Used to verify webhook signatures |
-| `RESEND_API_KEY` | Sends transactional email |
-| `EMAIL_FROM` | Sender address for invoices |
-| `CRON_SECRET` | Protects the overdue-reminder endpoint |
-| `APP_URL` | Base URL used in emailed links |
+| Variable                                | Purpose                                          |
+| --------------------------------------- | ------------------------------------------------ |
+| `DATABASE_URL`                          | Pooled Postgres connection string                |
+| `DIRECT_URL`                            | Direct Postgres connection (used for migrations) |
+| `AUTH_SECRET`                           | Secret for signing Auth.js tokens                |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth credentials                         |
+| `STRIPE_SECRET_KEY`                     | Stripe API key (test mode)                       |
+| `STRIPE_WEBHOOK_SECRET`                 | Used to verify webhook signatures                |
+| `RESEND_API_KEY`                        | Sends transactional email                        |
+| `EMAIL_FROM`                            | Sender address for invoices                      |
+| `CRON_SECRET`                           | Protects the overdue-reminder endpoint           |
+| `APP_URL`                               | Base URL used in emailed links                   |
 
 ## Testing
 
