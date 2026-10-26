@@ -6,8 +6,7 @@
 >
 > 🔗 **Live demo:** _coming soon_ · Payments run in **Stripe test mode**, so no real money moves.
 
-<!-- Uncomment the badge below once the CI workflow exists (Phase 0) -->
-<!-- ![CI](https://github.com/avshr1/paydesk/actions/workflows/ci.yml/badge.svg) -->
+[![CI](https://github.com/avshr1/paydesk/actions/workflows/ci.yml/badge.svg)](https://github.com/avshr1/paydesk/actions/workflows/ci.yml)
 
 ---
 
