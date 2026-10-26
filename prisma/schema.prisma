@@ -1,0 +1,136 @@
+// Money is stored as integers: amounts in cents, tax rates in basis points
+// (825 = 8.25%), and quantities in hundredths (150 = 1.5). See docs/decisions.md.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+}
+
+enum EmailType {
+  INVOICE
+  REMINDER
+  RECEIPT
+}
+
+enum EmailStatus {
+  SENT
+  FAILED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  passwordHash String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  clients      Client[]
+  invoices     Invoice[]
+}
+
+model Client {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name       String
+  email      String
+  company    String?
+  address    String?
+  notes      String?
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  invoices   Invoice[]
+
+  @@index([userId])
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId       String
+  // Restrict: a client with invoices is archived, never deleted.
+  client         Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  number         String
+  status         InvoiceStatus @default(DRAFT)
+  publicToken    String        @unique
+  issueDate      DateTime
+  dueDate        DateTime
+  notes          String?
+  taxRateBps     Int           @default(0)
+  subtotalCents  Int           @default(0)
+  taxCents       Int           @default(0)
+  totalCents     Int           @default(0)
+  currency       String        @default("usd")
+  sentAt         DateTime?
+  paidAt         DateTime?
+  lastReminderAt DateTime?
+  reminderCount  Int           @default(0)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  lineItems      LineItem[]
+  payments       Payment[]
+  emailLogs      EmailLog[]
+
+  @@unique([userId, number])
+  @@index([userId, status])
+  @@index([status, dueDate])
+}
+
+model LineItem {
+  id                 String  @id @default(cuid())
+  invoiceId          String
+  invoice            Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  position           Int
+  description        String
+  quantityHundredths Int
+  unitPriceCents     Int
+  amountCents        Int
+
+  @@index([invoiceId])
+}
+
+model Payment {
+  id                    String   @id @default(cuid())
+  invoiceId             String
+  invoice               Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+  amountCents           Int
+  stripeSessionId       String   @unique
+  stripePaymentIntentId String?
+  createdAt             DateTime @default(now())
+
+  @@index([invoiceId])
+}
+
+model EmailLog {
+  id         String      @id @default(cuid())
+  invoiceId  String
+  invoice    Invoice     @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  type       EmailType
+  to         String
+  status     EmailStatus
+  providerId String?
+  error      String?
+  createdAt  DateTime    @default(now())
+
+  @@index([invoiceId])
+}
+
+// Processed Stripe webhook events, for idempotency.
+model StripeEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now())
+}
