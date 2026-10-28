@@ -4,7 +4,7 @@
 
 > 🚧 **Status:** In active development, built in phases. See the [roadmap](#roadmap) for progress.
 >
-> 🔗 **Live demo:** _coming soon_ · Payments run in **Stripe test mode**, so no real money moves.
+> 🔗 **Live demo:** [paydesk-theta.vercel.app](https://paydesk-theta.vercel.app) · Payments run in **Stripe test mode**, so no real money moves.
 
 [![CI](https://github.com/avshr1/paydesk/actions/workflows/ci.yml/badge.svg)](https://github.com/avshr1/paydesk/actions/workflows/ci.yml)
 
@@ -24,17 +24,17 @@
 
 ## Tech Stack
 
-| Area       | Technology                                             |
-| ---------- | ------------------------------------------------------ |
-| Framework  | Next.js (App Router), React, TypeScript (strict mode)  |
-| Styling    | Tailwind CSS                                           |
-| Database   | PostgreSQL ([Neon](https://neon.tech)) with Prisma ORM |
-| Auth       | Auth.js (Credentials + Google)                         |
-| Payments   | Stripe Checkout + webhooks                             |
-| Email      | Resend                                                 |
-| Validation | Zod on every form and API route                        |
-| Testing    | Vitest (unit), Playwright (end-to-end)                 |
-| CI/CD      | GitHub Actions, deployed on Vercel                     |
+| Area       | Technology                                                                     |
+| ---------- | ------------------------------------------------------------------------------ |
+| Framework  | Next.js (App Router), React, TypeScript (strict mode)                          |
+| Styling    | Tailwind CSS                                                                   |
+| Database   | PostgreSQL ([Prisma Postgres](https://www.prisma.io/postgres)) with Prisma ORM |
+| Auth       | Auth.js (Credentials + Google)                                                 |
+| Payments   | Stripe Checkout + webhooks                                                     |
+| Email      | Resend                                                                         |
+| Validation | Zod on every form and API route                                                |
+| Testing    | Vitest (unit), Playwright (end-to-end)                                         |
+| CI/CD      | GitHub Actions, deployed on Vercel                                             |
 
 ## Engineering Highlights
 
@@ -119,7 +119,7 @@ npm run test:e2e    # Playwright end-to-end tests
 
 ## Roadmap
 
-- [ ] **Phase 0:** Project setup, CI, and first deploy
+- [x] **Phase 0:** Project setup, CI, and first deploy
 - [ ] **Phase 1:** Authentication
 - [ ] **Phase 2:** Client management
 - [ ] **Phase 3:** Invoices and total calculations
