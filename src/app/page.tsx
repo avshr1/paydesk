@@ -1,69 +1,109 @@
-import Image from "next/image";
+const features = [
+  {
+    title: "Clients in one place",
+    body: "Keep every client's contact details, notes, and invoice history together.",
+  },
+  {
+    title: "Invoices that add up",
+    body: "Line items, tax, and due dates, with totals calculated on the server so they're always right.",
+  },
+  {
+    title: "Get paid online",
+    body: "Clients open a private link and pay by card through Stripe. No account needed.",
+  },
+  {
+    title: "Automatic reminders",
+    body: "Late invoices are marked overdue and clients get a polite weekly nudge.",
+  },
+];
+
+const steps = [
+  "Add a client",
+  "Create an invoice",
+  "Send the link",
+  "Get paid",
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex w-full max-w-3xl flex-1 flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-black">
-        <Image
-          className="h-5 w-[100px] dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl leading-10 font-semibold tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="flex flex-1 flex-col">
+      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
+        <span className="text-lg font-semibold tracking-tight">Paydesk</span>
+        <a
+          href="https://github.com/avshr1/paydesk"
+          className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+        >
+          GitHub
+        </a>
+      </header>
+
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-20 px-6 py-16">
+        <section className="flex max-w-2xl flex-col gap-6">
+          <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+            In development · sign-up coming soon
+          </span>
+          <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+            Invoicing and payments for freelancers.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg text-zinc-600 dark:text-zinc-400">
+            Manage clients, send invoices, and get paid online, without
+            spreadsheets or chasing emails.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="bg-foreground text-background flex h-12 w-full items-center justify-center gap-2 rounded-full px-5 transition-colors hover:bg-[#383838] md:w-[158px] dark:hover:bg-[#ccc]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="h-[14px] w-4 dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="https://github.com/avshr1/paydesk"
+              className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+            >
+              View the code
+            </a>
+            <a
+              href="https://github.com/avshr1/paydesk#roadmap"
+              className="rounded-lg border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            >
+              See the roadmap
+            </a>
+          </div>
+        </section>
+
+        <section aria-labelledby="features" className="flex flex-col gap-6">
+          <h2 id="features" className="text-xl font-semibold">
+            What it does
+          </h2>
+          <ul className="grid gap-4 sm:grid-cols-2">
+            {features.map((feature) => (
+              <li
+                key={feature.title}
+                className="rounded-xl border border-zinc-200 p-5 dark:border-zinc-800"
+              >
+                <h3 className="font-medium">{feature.title}</h3>
+                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                  {feature.body}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section aria-labelledby="how" className="flex flex-col gap-6">
+          <h2 id="how" className="text-xl font-semibold">
+            How it works
+          </h2>
+          <ol className="grid gap-4 sm:grid-cols-4">
+            {steps.map((step, index) => (
+              <li key={step} className="flex items-center gap-3">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
+                  {index + 1}
+                </span>
+                <span className="text-sm font-medium">{step}</span>
+              </li>
+            ))}
+          </ol>
+        </section>
       </main>
+
+      <footer className="mx-auto w-full max-w-5xl px-6 py-8 text-sm text-zinc-500">
+        Payments run in Stripe test mode. No real money moves.
+      </footer>
     </div>
   );
 }
