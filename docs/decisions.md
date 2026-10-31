@@ -40,4 +40,5 @@ All payments go to one Stripe test account.
 ## 8. No Auth.js database adapter
 
 Google sign-ins find or create a `User` row by verified email in the `jwt` callback, instead of using the Prisma adapter and its `Account`/`Session` tables.
-**Why:** With JWT sessions (#6) the adapter's tables would go mostly unused. One `User` row per email also means signing in with Google and with a password lead to the same account.
+**Why:** With JWT sessions (#6) the adapter's tables would go mostly unused.
+**Safeguard:** Google login is refused for an email that already has a password account. Sign-up doesn't verify emails yet, so that account could have been created by someone else, who would keep access through the password (account pre-hijacking).

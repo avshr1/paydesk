@@ -44,10 +44,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: { signIn: "/login" },
   providers,
   callbacks: {
-    signIn({ account, profile }) {
+    async signIn({ account, profile }) {
+      if (account?.provider !== "google") return true;
+
       // Only accept Google accounts whose email Google has verified.
-      if (account?.provider === "google")
-        return profile?.email_verified === true;
+      if (profile?.email_verified !== true || !profile.email) return false;
+
+      // Sign-up doesn't verify emails yet, so a password account with this
+      // email may have been created by someone else. Don't let Google log
+      // into it, or that person would keep access through the password.
+      const existing = await db.user.findUnique({
+        where: { email: profile.email.toLowerCase() },
+        select: { passwordHash: true },
+      });
+      if (existing?.passwordHash) return "/login?error=OAuthAccountNotLinked";
+
       return true;
     },
     async jwt({ token, user, account }) {
