@@ -36,3 +36,8 @@ Auth.js uses JWT sessions instead of database sessions.
 
 All payments go to one Stripe test account.
 **Future:** A production version would use Stripe Connect so each freelancer receives payments directly.
+
+## 8. No Auth.js database adapter
+
+Google sign-ins find or create a `User` row by verified email in the `jwt` callback, instead of using the Prisma adapter and its `Account`/`Session` tables.
+**Why:** With JWT sessions (#6) the adapter's tables would go mostly unused. One `User` row per email also means signing in with Google and with a password lead to the same account.

@@ -8,6 +8,10 @@ const envSchema = z.object({
   DATABASE_URL: z.url(),
   DIRECT_URL: z.url().optional(),
   APP_URL: z.url().default("http://localhost:3000"),
+  // Read directly by Auth.js. Generate one with: npx auth secret
+  AUTH_SECRET: z.string().min(32).optional(),
+  AUTH_GOOGLE_ID: z.string().min(1).optional(),
+  AUTH_GOOGLE_SECRET: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
