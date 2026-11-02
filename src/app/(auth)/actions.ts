@@ -1,11 +1,12 @@
 "use server";
 
+import { AuthError } from "next-auth";
 import { z } from "zod";
 import { signIn } from "@/auth";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
-import { signUpSchema } from "@/lib/validation/auth";
+import { logInSchema, signUpSchema } from "@/lib/validation/auth";
 
 export type AuthFormState = {
   message?: string;
@@ -51,5 +52,34 @@ export async function signUp(
 
   // Log the new user straight in. On success this throws a redirect.
   await signIn("credentials", { email, password, redirectTo: "/dashboard" });
+  return {};
+}
+
+export async function logIn(
+  _prev: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const input = {
+    email: String(formData.get("email") ?? ""),
+    password: String(formData.get("password") ?? ""),
+  };
+  const values = { email: input.email };
+
+  const parsed = logInSchema.safeParse(input);
+  if (!parsed.success) {
+    return { errors: z.flattenError(parsed.error).fieldErrors, values };
+  }
+
+  try {
+    // On success this throws a redirect, which must not be caught.
+    await signIn("credentials", { ...parsed.data, redirectTo: "/dashboard" });
+  } catch (error) {
+    if (error instanceof AuthError) {
+      // Same message for an unknown email and a wrong password, so the form
+      // doesn't reveal which emails have accounts.
+      return { message: "Incorrect email or password.", values };
+    }
+    throw error;
+  }
   return {};
 }
