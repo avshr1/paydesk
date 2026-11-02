@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const features = [
   {
     title: "Clients in one place",
@@ -29,18 +31,26 @@ export default function Home() {
     <div className="flex flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
         <span className="text-lg font-semibold tracking-tight">Paydesk</span>
-        <a
-          href="https://github.com/avshr1/paydesk"
-          className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-        >
-          GitHub
-        </a>
+        <nav className="flex items-center gap-5 text-sm">
+          <a
+            href="https://github.com/avshr1/paydesk"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >
+            GitHub
+          </a>
+          <Link
+            href="/login"
+            className="font-medium text-zinc-900 hover:underline dark:text-zinc-100"
+          >
+            Log in
+          </Link>
+        </nav>
       </header>
 
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-20 px-6 py-16">
         <section className="flex max-w-2xl flex-col gap-6">
           <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-            In development · sign-up coming soon
+            In development · invoicing coming soon
           </span>
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
             Invoicing and payments for freelancers.
@@ -50,9 +60,15 @@ export default function Home() {
             spreadsheets or chasing emails.
           </p>
           <div className="flex flex-wrap gap-3">
+            <Link
+              href="/signup"
+              className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+            >
+              Create an account
+            </Link>
             <a
               href="https://github.com/avshr1/paydesk"
-              className="rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+              className="rounded-lg border border-zinc-300 px-5 py-2.5 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
             >
               View the code
             </a>
