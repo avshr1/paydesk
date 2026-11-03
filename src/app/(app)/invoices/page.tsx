@@ -27,6 +27,12 @@ export default async function InvoicesPage({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">Invoices</h1>
+        <Link
+          href="/invoices/new"
+          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        >
+          New invoice
+        </Link>
       </div>
 
       <nav aria-label="Filter by status" className="flex flex-wrap gap-2">

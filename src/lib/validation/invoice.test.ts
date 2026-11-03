@@ -62,6 +62,20 @@ describe("invoiceSchema", () => {
     });
   });
 
+  it("reports a bad due date even when other fields also have errors", () => {
+    const result = invoiceSchema.safeParse({
+      ...valid,
+      dueDate: "2026-10-31",
+      lineItems: [{ ...valid.lineItems[0], description: "" }],
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error?.issues.map((issue) => issue.path.join("."))).toEqual([
+      "lineItems.0.description",
+      "dueDate",
+    ]);
+  });
+
   it("requires at least one line item", () => {
     expect(firstError({ ...valid, lineItems: [] })?.message).toBe(
       "Add at least one line item",

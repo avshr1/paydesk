@@ -16,6 +16,7 @@ const hundredths = (label: string) =>
   });
 
 const isoDate = z.iso.date("Enter a valid date");
+const datesSchema = z.object({ issueDate: isoDate, dueDate: isoDate });
 
 export const lineItemSchema = z.object({
   description: z.string().trim().min(1, "Description is required").max(500),
@@ -48,6 +49,9 @@ export const invoiceSchema = z
   .refine((invoice) => invoice.dueDate >= invoice.issueDate, {
     message: "Due date can't be before the issue date",
     path: ["dueDate"],
+    // Check the dates as soon as both are valid, even if other fields have
+    // errors, so the user sees every problem at once.
+    when: ({ value }) => datesSchema.safeParse(value).success,
   });
 
 export type InvoiceInput = z.infer<typeof invoiceSchema>;
