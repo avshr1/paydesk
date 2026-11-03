@@ -14,3 +14,11 @@ export function listClients(userId: string, { archived = false } = {}) {
 export function getClient(userId: string, clientId: string) {
   return db.client.findFirst({ where: { id: clientId, userId } });
 }
+
+export function countInvoices(userId: string, clientId: string) {
+  return db.invoice.count({ where: { clientId, userId } });
+}
+
+export function countArchivedClients(userId: string) {
+  return db.client.count({ where: { userId, archivedAt: { not: null } } });
+}

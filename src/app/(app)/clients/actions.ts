@@ -63,3 +63,40 @@ export async function updateClient(
   revalidatePath("/clients");
   redirect("/clients");
 }
+
+// Clients with invoices are archived instead of deleted, so financial records
+// stay complete. See docs/decisions.md #5.
+export async function removeClient(clientId: string) {
+  const userId = await requireUserId();
+
+  const client = await db.client.findFirst({
+    where: { id: clientId, userId },
+    select: { _count: { select: { invoices: true } } },
+  });
+  if (!client) notFound();
+
+  if (client._count.invoices === 0) {
+    await db.client.deleteMany({ where: { id: clientId, userId } });
+  } else {
+    await db.client.updateMany({
+      where: { id: clientId, userId },
+      data: { archivedAt: new Date() },
+    });
+  }
+
+  revalidatePath("/clients");
+  redirect("/clients");
+}
+
+export async function restoreClient(clientId: string) {
+  const userId = await requireUserId();
+
+  const { count } = await db.client.updateMany({
+    where: { id: clientId, userId },
+    data: { archivedAt: null },
+  });
+  if (count === 0) notFound();
+
+  revalidatePath("/clients");
+  redirect(`/clients/${clientId}`);
+}
