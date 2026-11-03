@@ -17,9 +17,17 @@ export default async function AppLayout({
     <div className="flex flex-1 flex-col">
       <header className="border-b border-zinc-200 dark:border-zinc-800">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="font-semibold tracking-tight">
-            Paydesk
-          </Link>
+          <nav className="flex items-center gap-6">
+            <Link href="/dashboard" className="font-semibold tracking-tight">
+              Paydesk
+            </Link>
+            <Link
+              href="/clients"
+              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              Clients
+            </Link>
+          </nav>
           <div className="flex items-center gap-4">
             <span className="hidden text-sm text-zinc-600 sm:inline dark:text-zinc-400">
               {session.user.email}
