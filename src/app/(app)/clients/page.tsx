@@ -13,6 +13,12 @@ export default async function ClientsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">Clients</h1>
+        <Link
+          href="/clients/new"
+          className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+        >
+          Add client
+        </Link>
       </div>
 
       {clients.length === 0 ? (
