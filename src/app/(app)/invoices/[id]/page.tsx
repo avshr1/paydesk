@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ConfirmButton } from "@/components/confirm-button";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/dates";
 import { isEditable } from "@/lib/invoice-status";
 import { getInvoice } from "@/lib/invoices";
 import { formatCents } from "@/lib/money";
 import { requireUserId } from "@/lib/session";
+import { deleteInvoice } from "../actions";
 
 export const metadata: Metadata = { title: "Invoice · Paydesk" };
 
@@ -145,6 +147,17 @@ export default async function InvoicePage({
           </h2>
           <p className="whitespace-pre-line">{invoice.notes}</p>
         </section>
+      )}
+
+      {isEditable(invoice.status) && (
+        <form action={deleteInvoice.bind(null, invoice.id)}>
+          <ConfirmButton
+            confirmMessage={`Delete draft ${invoice.number}? This can't be undone.`}
+            className="rounded-lg border border-red-300 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 disabled:opacity-60 dark:border-red-900 dark:text-red-400 dark:hover:bg-red-950"
+          >
+            Delete draft
+          </ConfirmButton>
+        </form>
       )}
 
       <Link

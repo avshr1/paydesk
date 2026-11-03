@@ -81,6 +81,14 @@ export function InvoiceForm({
 
   return (
     <form action={formAction} className="flex flex-col gap-6" noValidate>
+      {state.message && (
+        <p
+          role="alert"
+          className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300"
+        >
+          {state.message}
+        </p>
+      )}
       <input
         type="hidden"
         name="lineItems"

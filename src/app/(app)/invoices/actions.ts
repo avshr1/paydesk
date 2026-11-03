@@ -1,14 +1,16 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Prisma } from "@/generated/prisma/client";
+import { InvoiceStatus } from "@/generated/prisma/enums";
 import { db } from "@/lib/db";
 import { parseDateOnly } from "@/lib/dates";
 import {
   generatePublicToken,
   nextInvoiceNumber,
 } from "@/lib/invoice-identifiers";
+import { isEditable } from "@/lib/invoice-status";
 import { calculateTotals } from "@/lib/money";
 import { requireUserId } from "@/lib/session";
 import { invoiceSchema, type InvoiceInput } from "@/lib/validation/invoice";
@@ -29,6 +31,7 @@ export type InvoiceFormValues = {
 };
 
 export type InvoiceFormState = {
+  message?: string;
   // Keyed by field path, e.g. "dueDate" or "lineItems.0.unitPriceCents".
   errors?: Record<string, string[]>;
   values?: InvoiceFormValues;
@@ -160,4 +163,63 @@ export async function createInvoice(
 
   revalidatePath("/invoices");
   redirect(`/invoices/${invoiceId}`);
+}
+
+const LOCKED = "Only draft invoices can be edited.";
+
+// Sent invoices are locked (decisions.md #5). Every write below includes
+// status: DRAFT in its filter, so an invoice sent in the meantime can't be
+// changed even if this request started before it was sent.
+export async function updateInvoice(
+  invoiceId: string,
+  _prev: InvoiceFormState,
+  formData: FormData,
+): Promise<InvoiceFormState> {
+  const userId = await requireUserId();
+  const values = readForm(formData);
+
+  const existing = await db.invoice.findFirst({
+    where: { id: invoiceId, userId },
+    select: { status: true },
+  });
+  if (!existing) notFound();
+  if (!isEditable(existing.status)) return { message: LOCKED, values };
+
+  const parsed = await parseInvoice(userId, values);
+  if (!parsed.ok) return parsed.state;
+
+  const { lineItems, ...data } = invoiceData(parsed.data);
+  try {
+    await db.invoice.update({
+      where: { id: invoiceId, userId, status: InvoiceStatus.DRAFT },
+      data: {
+        ...data,
+        lineItems: { deleteMany: {}, create: lineItems },
+      },
+    });
+  } catch (error) {
+    // P2025: no draft matched, so it was sent or deleted in the meantime.
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2025"
+    ) {
+      return { message: LOCKED, values };
+    }
+    throw error;
+  }
+
+  revalidatePath("/invoices");
+  redirect(`/invoices/${invoiceId}`);
+}
+
+export async function deleteInvoice(invoiceId: string) {
+  const userId = await requireUserId();
+
+  const { count } = await db.invoice.deleteMany({
+    where: { id: invoiceId, userId, status: InvoiceStatus.DRAFT },
+  });
+  if (count === 0) notFound();
+
+  revalidatePath("/invoices");
+  redirect("/invoices");
 }
