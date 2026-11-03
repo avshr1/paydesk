@@ -27,6 +27,12 @@ export default async function AppLayout({
             >
               Clients
             </Link>
+            <Link
+              href="/invoices"
+              className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              Invoices
+            </Link>
           </nav>
           <div className="flex items-center gap-4">
             <span className="hidden text-sm text-zinc-600 sm:inline dark:text-zinc-400">
