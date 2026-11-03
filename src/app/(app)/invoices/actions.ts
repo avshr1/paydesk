@@ -159,5 +159,5 @@ export async function createInvoice(
   }
 
   revalidatePath("/invoices");
-  redirect("/invoices");
+  redirect(`/invoices/${invoiceId}`);
 }
