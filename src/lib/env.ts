@@ -12,6 +12,9 @@ const envSchema = z.object({
   AUTH_SECRET: z.string().min(32).optional(),
   AUTH_GOOGLE_ID: z.string().min(1).optional(),
   AUTH_GOOGLE_SECRET: z.string().min(1).optional(),
+  // Email via Resend (resend.com). Optional until Phase 4 is set up.
+  RESEND_API_KEY: z.string().startsWith("re_").optional(),
+  EMAIL_FROM: z.string().min(3).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
