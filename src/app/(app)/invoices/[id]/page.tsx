@@ -2,25 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ConfirmButton } from "@/components/confirm-button";
+import { InvoiceDocument } from "@/components/invoice-document";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/dates";
 import { isEditable } from "@/lib/invoice-status";
 import { getInvoice } from "@/lib/invoices";
-import { formatCents } from "@/lib/money";
 import { requireUserId } from "@/lib/session";
 import { deleteInvoice } from "../actions";
 
 export const metadata: Metadata = { title: "Invoice · Paydesk" };
-
-function formatQuantity(hundredths: number) {
-  return (hundredths / 100).toLocaleString("en-US", {
-    maximumFractionDigits: 2,
-  });
-}
-
-function formatTaxRate(bps: number) {
-  return `${(bps / 100).toLocaleString("en-US", { maximumFractionDigits: 2 })}%`;
-}
 
 export default async function InvoicePage({
   params,
@@ -30,8 +20,6 @@ export default async function InvoicePage({
 
   const invoice = await getInvoice(userId, id);
   if (!invoice) notFound();
-
-  const money = (cents: number) => formatCents(cents, invoice.currency);
 
   return (
     <div className="flex max-w-3xl flex-col gap-8">
@@ -58,96 +46,10 @@ export default async function InvoicePage({
         )}
       </div>
 
-      <section
-        aria-labelledby="bill-to"
-        className="flex flex-col gap-1 text-sm"
-      >
-        <h2
-          id="bill-to"
-          className="text-xs font-medium text-zinc-500 uppercase"
-        >
-          Bill to
-        </h2>
-        <Link
-          href={`/clients/${invoice.client.id}`}
-          className="font-medium hover:underline"
-        >
-          {invoice.client.name}
-        </Link>
-        {invoice.client.company && <p>{invoice.client.company}</p>}
-        <p className="text-zinc-600 dark:text-zinc-400">
-          {invoice.client.email}
-        </p>
-        {invoice.client.address && (
-          <p className="whitespace-pre-line text-zinc-600 dark:text-zinc-400">
-            {invoice.client.address}
-          </p>
-        )}
-      </section>
-
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-zinc-200 text-left text-xs text-zinc-500 dark:border-zinc-800">
-              <th className="py-2 pr-4 font-medium">Description</th>
-              <th className="py-2 pr-4 text-right font-medium">Qty</th>
-              <th className="py-2 pr-4 text-right font-medium">Unit price</th>
-              <th className="py-2 text-right font-medium">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoice.lineItems.map((item) => (
-              <tr
-                key={item.id}
-                className="border-b border-zinc-100 dark:border-zinc-900"
-              >
-                <td className="py-3 pr-4">{item.description}</td>
-                <td className="py-3 pr-4 text-right tabular-nums">
-                  {formatQuantity(item.quantityHundredths)}
-                </td>
-                <td className="py-3 pr-4 text-right tabular-nums">
-                  {money(item.unitPriceCents)}
-                </td>
-                <td className="py-3 text-right tabular-nums">
-                  {money(item.amountCents)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <dl className="ml-auto grid w-full max-w-xs grid-cols-2 gap-y-1 text-sm">
-        <dt className="text-zinc-600 dark:text-zinc-400">Subtotal</dt>
-        <dd className="text-right tabular-nums">
-          {money(invoice.subtotalCents)}
-        </dd>
-        <dt className="text-zinc-600 dark:text-zinc-400">
-          Tax ({formatTaxRate(invoice.taxRateBps)})
-        </dt>
-        <dd className="text-right tabular-nums">{money(invoice.taxCents)}</dd>
-        <dt className="border-t border-zinc-200 pt-2 font-medium dark:border-zinc-800">
-          Total
-        </dt>
-        <dd className="border-t border-zinc-200 pt-2 text-right font-semibold tabular-nums dark:border-zinc-800">
-          {money(invoice.totalCents)}
-        </dd>
-      </dl>
-
-      {invoice.notes && (
-        <section
-          aria-labelledby="notes"
-          className="flex flex-col gap-1 text-sm"
-        >
-          <h2
-            id="notes"
-            className="text-xs font-medium text-zinc-500 uppercase"
-          >
-            Notes
-          </h2>
-          <p className="whitespace-pre-line">{invoice.notes}</p>
-        </section>
-      )}
+      <InvoiceDocument
+        invoice={invoice}
+        clientHref={`/clients/${invoice.client.id}`}
+      />
 
       {isEditable(invoice.status) && (
         <form action={deleteInvoice.bind(null, invoice.id)}>
