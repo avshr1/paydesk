@@ -50,7 +50,7 @@ export default function Home() {
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-20 px-6 py-16">
         <section className="flex max-w-2xl flex-col gap-6">
           <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-            In development · invoicing coming soon
+            In development · online payments coming soon
           </span>
           <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
             Invoicing and payments for freelancers.

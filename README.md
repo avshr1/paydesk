@@ -121,8 +121,8 @@ npm run test:e2e    # Playwright end-to-end tests
 
 - [x] **Phase 0:** Project setup, CI, and first deploy
 - [ ] **Phase 1:** Authentication
-- [ ] **Phase 2:** Client management
-- [ ] **Phase 3:** Invoices and total calculations
+- [x] **Phase 2:** Client management
+- [x] **Phase 3:** Invoices and total calculations
 - [ ] **Phase 4:** Email delivery and public invoice page
 - [ ] **Phase 5:** Stripe payments and webhooks
 - [ ] **Phase 6:** PDF export
