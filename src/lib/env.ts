@@ -27,7 +27,13 @@ export function parseEnv(source: Record<string, string | undefined>): Env {
       .join("\n");
     throw new Error(`Invalid environment variables:\n${details}`);
   }
-  return result.data;
+  const { data } = result;
+  // Vercel provides the production domain, so emailed links work without
+  // setting APP_URL by hand. An explicit APP_URL always wins.
+  if (!source.APP_URL && source.VERCEL_PROJECT_PRODUCTION_URL) {
+    data.APP_URL = `https://${source.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  return data;
 }
 
 export const env = parseEnv(process.env);
