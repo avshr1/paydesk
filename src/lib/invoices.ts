@@ -17,6 +17,7 @@ export function getInvoice(userId: string, invoiceId: string) {
     include: {
       client: true,
       lineItems: { orderBy: { position: "asc" } },
+      emailLogs: { orderBy: { createdAt: "desc" } },
     },
   });
 }

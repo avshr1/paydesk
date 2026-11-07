@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ConfirmButton } from "@/components/confirm-button";
+import { CopyButton } from "@/components/copy-button";
 import { InvoiceDocument } from "@/components/invoice-document";
 import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/dates";
+import { publicInvoiceUrl } from "@/lib/invoice-delivery";
 import { isEditable } from "@/lib/invoice-status";
 import { getInvoice } from "@/lib/invoices";
 import { requireUserId } from "@/lib/session";
@@ -57,6 +59,53 @@ export default async function InvoicePage({
         invoice={invoice}
         clientHref={`/clients/${invoice.client.id}`}
       />
+
+      {!isEditable(invoice.status) && (
+        <section aria-labelledby="client-link" className="flex flex-col gap-2">
+          <h2
+            id="client-link"
+            className="text-xs font-medium text-zinc-500 uppercase"
+          >
+            Client link
+          </h2>
+          <div className="flex items-center gap-3">
+            <code className="min-w-0 flex-1 truncate rounded-lg bg-zinc-100 px-3 py-2 text-sm dark:bg-zinc-900">
+              {publicInvoiceUrl(invoice.publicToken)}
+            </code>
+            <CopyButton value={publicInvoiceUrl(invoice.publicToken)} />
+          </div>
+        </section>
+      )}
+
+      {invoice.emailLogs.length > 0 && (
+        <section aria-labelledby="emails" className="flex flex-col gap-2">
+          <h2
+            id="emails"
+            className="text-xs font-medium text-zinc-500 uppercase"
+          >
+            Email history
+          </h2>
+          <ul className="flex flex-col gap-1 text-sm">
+            {invoice.emailLogs.map((log) => (
+              <li key={log.id}>
+                <span
+                  className={
+                    log.status === "SENT"
+                      ? "text-emerald-700 dark:text-emerald-400"
+                      : "text-red-600 dark:text-red-400"
+                  }
+                >
+                  {log.status === "SENT" ? "Sent" : "Failed"}
+                </span>{" "}
+                to {log.to} on {formatDate(log.createdAt)}
+                {log.error && (
+                  <span className="text-zinc-500"> · {log.error}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {isEditable(invoice.status) && (
         <form action={deleteInvoice.bind(null, invoice.id)}>
