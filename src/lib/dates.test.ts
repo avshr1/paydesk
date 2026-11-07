@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { formatDate, parseDateOnly, toDateInputValue } from "@/lib/dates";
+import {
+  formatDate,
+  formatTimestamp,
+  parseDateOnly,
+  toDateInputValue,
+} from "@/lib/dates";
 
 describe("dates", () => {
   it("round-trips a calendar day", () => {
@@ -8,5 +13,12 @@ describe("dates", () => {
 
   it("formats in UTC so the day never shifts", () => {
     expect(formatDate(parseDateOnly("2026-01-01"))).toBe("Jan 1, 2026");
+  });
+
+  it("labels timestamps as UTC", () => {
+    expect(formatTimestamp(new Date("2026-11-07T01:30:00Z"))).toContain(
+      "Nov 7, 2026",
+    );
+    expect(formatTimestamp(new Date("2026-11-07T01:30:00Z"))).toContain("UTC");
   });
 });

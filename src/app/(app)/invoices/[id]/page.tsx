@@ -5,7 +5,7 @@ import { ConfirmButton } from "@/components/confirm-button";
 import { CopyButton } from "@/components/copy-button";
 import { InvoiceDocument } from "@/components/invoice-document";
 import { StatusBadge } from "@/components/status-badge";
-import { formatDate } from "@/lib/dates";
+import { formatDate, formatTimestamp } from "@/lib/dates";
 import { publicInvoiceUrl } from "@/lib/invoice-delivery";
 import { isEditable } from "@/lib/invoice-status";
 import { getInvoice } from "@/lib/invoices";
@@ -97,7 +97,7 @@ export default async function InvoicePage({
                 >
                   {log.status === "SENT" ? "Sent" : "Failed"}
                 </span>{" "}
-                to {log.to} on {formatDate(log.createdAt)}
+                to {log.to} on {formatTimestamp(log.createdAt)}
                 {log.error && (
                   <span className="text-zinc-500"> · {log.error}</span>
                 )}

@@ -14,3 +14,14 @@ export function formatDate(date: Date): string {
     timeZone: "UTC",
   }).format(date);
 }
+
+// For moments in time, like when an email was sent. Labelled UTC, because the
+// server doesn't know the viewer's time zone.
+export function formatTimestamp(date: Date): string {
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "UTC",
+    timeZoneName: "short",
+  }).format(date);
+}
