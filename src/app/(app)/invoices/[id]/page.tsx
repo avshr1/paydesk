@@ -8,7 +8,8 @@ import { formatDate } from "@/lib/dates";
 import { isEditable } from "@/lib/invoice-status";
 import { getInvoice } from "@/lib/invoices";
 import { requireUserId } from "@/lib/session";
-import { deleteInvoice } from "../actions";
+import { deleteInvoice, sendInvoice } from "../actions";
+import { SendInvoiceForm } from "./send-invoice-form";
 
 export const metadata: Metadata = { title: "Invoice · Paydesk" };
 
@@ -37,12 +38,18 @@ export default async function InvoicePage({
           </p>
         </div>
         {isEditable(invoice.status) && (
-          <Link
-            href={`/invoices/${invoice.id}/edit`}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
-          >
-            Edit draft
-          </Link>
+          <div className="flex flex-wrap items-start gap-3">
+            <Link
+              href={`/invoices/${invoice.id}/edit`}
+              className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            >
+              Edit draft
+            </Link>
+            <SendInvoiceForm
+              action={sendInvoice.bind(null, invoice.id)}
+              clientEmail={invoice.client.email}
+            />
+          </div>
         )}
       </div>
 

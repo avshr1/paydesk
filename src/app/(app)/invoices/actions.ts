@@ -10,6 +10,7 @@ import {
   generatePublicToken,
   nextInvoiceNumber,
 } from "@/lib/invoice-identifiers";
+import { deliverInvoice } from "@/lib/invoice-delivery";
 import { isEditable } from "@/lib/invoice-status";
 import { calculateTotals } from "@/lib/money";
 import { requireUserId } from "@/lib/session";
@@ -222,4 +223,20 @@ export async function deleteInvoice(invoiceId: string) {
 
   revalidatePath("/invoices");
   redirect("/invoices");
+}
+
+export type SendInvoiceState = { error?: string };
+
+export async function sendInvoice(
+  invoiceId: string,
+): Promise<SendInvoiceState> {
+  const userId = await requireUserId();
+
+  const result = await deliverInvoice(userId, invoiceId);
+  if (result.status === "not_found") notFound();
+
+  // A failed attempt is logged too, so refresh the page either way.
+  revalidatePath(`/invoices/${invoiceId}`);
+  revalidatePath("/invoices");
+  return result.status === "failed" ? { error: result.error } : {};
 }
