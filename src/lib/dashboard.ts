@@ -1,6 +1,7 @@
 import { InvoiceStatus } from "@/generated/prisma/enums";
 import { db } from "@/lib/db";
 import { pastDueCutoff } from "@/lib/invoice-status";
+import { bucketRevenueByMonth } from "@/lib/revenue";
 
 const { SENT, PAID, OVERDUE } = InvoiceStatus;
 
@@ -52,4 +53,31 @@ export function listRecentInvoices(userId: string) {
     take: 5,
     include: { client: { select: { name: true } } },
   });
+}
+
+const REVENUE_MONTHS = 12;
+
+// Summed by the database. Paid invoices are grouped by the month of paidAt.
+export async function getMonthlyRevenue(
+  userId: string,
+  now: Date = new Date(),
+) {
+  const start = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (REVENUE_MONTHS - 1), 1),
+  );
+  const rows = await db.$queryRaw<{ month: string; cents: bigint }[]>`
+    SELECT to_char("paidAt", 'YYYY-MM') AS month,
+           SUM("totalCents")::bigint AS cents
+    FROM "Invoice"
+    WHERE "userId" = ${userId}
+      AND "status" = 'PAID'
+      AND "paidAt" >= ${start}
+    GROUP BY 1
+  `;
+
+  return bucketRevenueByMonth(
+    rows.map((row) => ({ month: row.month, cents: Number(row.cents) })),
+    now,
+    REVENUE_MONTHS,
+  );
 }
