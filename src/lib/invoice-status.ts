@@ -25,6 +25,12 @@ export function isPastDue(dueDate: Date, now: Date = new Date()): boolean {
   return now.getTime() >= dueDate.getTime() + DAY_MS;
 }
 
+// SENT invoices due on or before this moment are past due. The database
+// version of isPastDue, for queries.
+export function pastDueCutoff(now: Date = new Date()): Date {
+  return new Date(now.getTime() - DAY_MS);
+}
+
 export function shouldMarkOverdue(
   invoice: { status: InvoiceStatus; dueDate: Date },
   now: Date = new Date(),

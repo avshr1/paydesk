@@ -3,6 +3,7 @@ import {
   canTransition,
   isEditable,
   isPastDue,
+  pastDueCutoff,
   shouldMarkOverdue,
 } from "@/lib/invoice-status";
 
@@ -45,6 +46,15 @@ describe("isPastDue", () => {
 
   it("is past due the day after", () => {
     expect(isPastDue(dueDate, new Date("2026-11-16T00:00:00Z"))).toBe(true);
+  });
+});
+
+describe("pastDueCutoff", () => {
+  it("agrees with isPastDue at the boundary", () => {
+    const now = new Date("2026-11-16T00:00:00Z");
+
+    expect(pastDueCutoff(now)).toEqual(new Date("2026-11-15T00:00:00Z"));
+    expect(isPastDue(pastDueCutoff(now), now)).toBe(true);
   });
 });
 
