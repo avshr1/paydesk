@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Client, Invoice, LineItem } from "@/generated/prisma/client";
+import { formatQuantity, formatTaxRate } from "@/lib/invoice-format";
 import { formatCents } from "@/lib/money";
 
 type InvoiceDocumentProps = {
@@ -9,16 +10,6 @@ type InvoiceDocumentProps = {
   // Where the client's name links to; omitted on the public page.
   clientHref?: string;
 };
-
-function formatQuantity(hundredths: number) {
-  return (hundredths / 100).toLocaleString("en-US", {
-    maximumFractionDigits: 2,
-  });
-}
-
-function formatTaxRate(bps: number) {
-  return `${(bps / 100).toLocaleString("en-US", { maximumFractionDigits: 2 })}%`;
-}
 
 // The body of an invoice, shared by the freelancer's page and the public page
 // so both always show the same thing.
