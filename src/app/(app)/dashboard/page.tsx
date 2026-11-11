@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { StatusBadge } from "@/components/status-badge";
 import { auth } from "@/auth";
-import { getDashboardSummary, listRecentInvoices } from "@/lib/dashboard";
+import {
+  getDashboardSummary,
+  getMonthlyRevenue,
+  listRecentInvoices,
+} from "@/lib/dashboard";
 import { formatDate } from "@/lib/dates";
 import { formatCents } from "@/lib/money";
 import { requireUserId } from "@/lib/session";
+import { RevenueChart } from "./revenue-chart";
 
 export const metadata: Metadata = { title: "Dashboard · Paydesk" };
 
@@ -34,10 +39,11 @@ const countLabel = (count: number) =>
 
 export default async function DashboardPage() {
   const userId = await requireUserId();
-  const [session, summary, recent] = await Promise.all([
+  const [session, summary, recent, revenue] = await Promise.all([
     auth(),
     getDashboardSummary(userId),
     listRecentInvoices(userId),
+    getMonthlyRevenue(userId),
   ]);
   const firstName = session?.user?.name?.split(" ")[0];
 
@@ -85,6 +91,21 @@ export default async function DashboardPage() {
               detail={countLabel(summary.overdueCount)}
             />
           </div>
+
+          <section
+            aria-labelledby="revenue"
+            className="flex flex-col gap-3 rounded-xl border border-zinc-200 p-5 dark:border-zinc-800"
+          >
+            <div>
+              <h2 id="revenue" className="font-medium">
+                Revenue
+              </h2>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                Paid invoices by month, last 12 months
+              </p>
+            </div>
+            <RevenueChart months={revenue} />
+          </section>
 
           <section aria-labelledby="recent" className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
