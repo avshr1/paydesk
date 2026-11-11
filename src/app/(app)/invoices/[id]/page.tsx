@@ -39,20 +39,30 @@ export default async function InvoicePage({
             {formatDate(invoice.dueDate)}
           </p>
         </div>
-        {isEditable(invoice.status) && (
-          <div className="flex flex-wrap items-start gap-3">
-            <Link
-              href={`/invoices/${invoice.id}/edit`}
-              className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
-            >
-              Edit draft
-            </Link>
-            <SendInvoiceForm
-              action={sendInvoice.bind(null, invoice.id)}
-              clientEmail={invoice.client.email}
-            />
-          </div>
-        )}
+        <div className="flex flex-wrap items-start gap-3">
+          {/* A plain link, not <Link>: it downloads a file, not a page. */}
+          <a
+            href={`/invoices/${invoice.id}/pdf`}
+            download
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          >
+            Download PDF
+          </a>
+          {isEditable(invoice.status) && (
+            <>
+              <Link
+                href={`/invoices/${invoice.id}/edit`}
+                className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              >
+                Edit draft
+              </Link>
+              <SendInvoiceForm
+                action={sendInvoice.bind(null, invoice.id)}
+                clientEmail={invoice.client.email}
+              />
+            </>
+          )}
+        </div>
       </div>
 
       <InvoiceDocument

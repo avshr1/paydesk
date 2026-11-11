@@ -47,6 +47,13 @@ export default async function PublicInvoicePage({
           <p className="text-2xl font-semibold tabular-nums">
             {formatCents(invoice.totalCents, invoice.currency)}
           </p>
+          <a
+            href={`/i/${token}/pdf`}
+            download
+            className="mt-2 inline-block text-sm font-medium underline"
+          >
+            Download PDF
+          </a>
         </div>
       </div>
 
