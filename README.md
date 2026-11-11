@@ -126,7 +126,7 @@ npm run test:e2e    # Playwright end-to-end tests
 - [ ] **Phase 4:** Email delivery and public invoice page
 - [ ] **Phase 5:** Stripe payments and webhooks
 - [ ] **Phase 6:** PDF export
-- [ ] **Phase 7:** Dashboard and revenue chart
+- [x] **Phase 7:** Dashboard and revenue chart
 - [ ] **Phase 8:** Overdue reminders
 - [ ] **Phase 9:** End-to-end tests and polish
 
