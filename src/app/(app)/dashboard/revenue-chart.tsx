@@ -85,7 +85,7 @@ export function RevenueChart({ months }: { months: MonthRevenue[] }) {
                 y={y(tick)}
                 dy="0.32em"
                 textAnchor="end"
-                className="fill-zinc-500 text-[11px] tabular-nums"
+                className="fill-zinc-500 text-[11px] tabular-nums dark:fill-zinc-400"
               >
                 {axisLabel(tick)}
               </text>
@@ -130,7 +130,7 @@ export function RevenueChart({ months }: { months: MonthRevenue[] }) {
                   x={slotX + slot / 2}
                   y={HEIGHT - 8}
                   textAnchor="middle"
-                  className={`text-[11px] ${isActive ? "fill-zinc-900 dark:fill-zinc-100" : "fill-zinc-500"}`}
+                  className={`text-[11px] ${isActive ? "fill-zinc-900 dark:fill-zinc-100" : "fill-zinc-500 dark:fill-zinc-400"}`}
                 >
                   {slot < 28 && index % 2 === 1 ? "" : month.label}
                 </text>
@@ -153,7 +153,7 @@ export function RevenueChart({ months }: { months: MonthRevenue[] }) {
             <p className="font-semibold tabular-nums">
               {formatCents(activeMonth.cents)}
             </p>
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               {new Date(`${activeMonth.month}-01T00:00:00Z`).toLocaleString(
                 "en-US",
                 { month: "long", year: "numeric", timeZone: "UTC" },
@@ -169,7 +169,7 @@ export function RevenueChart({ months }: { months: MonthRevenue[] }) {
         </summary>
         <table className="mt-2 w-full max-w-sm">
           <thead>
-            <tr className="text-left text-xs text-zinc-500">
+            <tr className="text-left text-xs text-zinc-500 dark:text-zinc-400">
               <th className="py-1 font-medium">Month</th>
               <th className="py-1 text-right font-medium">Paid</th>
             </tr>

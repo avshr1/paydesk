@@ -55,7 +55,7 @@ export default async function ClientsPage({
                     {client.email}
                   </p>
                 </div>
-                <span className="shrink-0 text-sm text-zinc-500">
+                <span className="shrink-0 text-sm text-zinc-500 dark:text-zinc-400">
                   {client._count.invoices}{" "}
                   {client._count.invoices === 1 ? "invoice" : "invoices"}
                 </span>

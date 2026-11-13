@@ -59,7 +59,7 @@ export default async function PublicInvoicePage({
 
       <InvoiceDocument invoice={invoice} from={invoice.user} />
 
-      <footer className="border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800">
+      <footer className="border-t border-zinc-200 pt-6 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
         Sent with Paydesk. Payments run in Stripe test mode.
       </footer>
     </main>

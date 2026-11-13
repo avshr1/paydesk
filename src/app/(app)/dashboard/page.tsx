@@ -29,7 +29,7 @@ function SummaryCard({
       <p className="mt-1 text-2xl font-semibold tabular-nums">
         {formatCents(cents)}
       </p>
-      <p className="mt-1 text-xs text-zinc-500">{detail}</p>
+      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{detail}</p>
     </div>
   );
 }

@@ -30,7 +30,7 @@ export function InvoiceDocument({
           >
             <h2
               id="from"
-              className="text-xs font-medium text-zinc-500 uppercase"
+              className="text-xs font-medium text-zinc-500 uppercase dark:text-zinc-400"
             >
               From
             </h2>
@@ -45,7 +45,7 @@ export function InvoiceDocument({
         >
           <h2
             id="bill-to"
-            className="text-xs font-medium text-zinc-500 uppercase"
+            className="text-xs font-medium text-zinc-500 uppercase dark:text-zinc-400"
           >
             Bill to
           </h2>
@@ -71,7 +71,7 @@ export function InvoiceDocument({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-zinc-200 text-left text-xs text-zinc-500 dark:border-zinc-800">
+            <tr className="border-b border-zinc-200 text-left text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
               <th className="py-2 pr-4 font-medium">Description</th>
               <th className="py-2 pr-4 text-right font-medium">Qty</th>
               <th className="py-2 pr-4 text-right font-medium">Unit price</th>
@@ -124,7 +124,7 @@ export function InvoiceDocument({
         >
           <h2
             id="notes"
-            className="text-xs font-medium text-zinc-500 uppercase"
+            className="text-xs font-medium text-zinc-500 uppercase dark:text-zinc-400"
           >
             Notes
           </h2>

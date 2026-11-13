@@ -74,7 +74,7 @@ export default async function InvoicePage({
         <section aria-labelledby="client-link" className="flex flex-col gap-2">
           <h2
             id="client-link"
-            className="text-xs font-medium text-zinc-500 uppercase"
+            className="text-xs font-medium text-zinc-500 uppercase dark:text-zinc-400"
           >
             Client link
           </h2>
@@ -91,7 +91,7 @@ export default async function InvoicePage({
         <section aria-labelledby="emails" className="flex flex-col gap-2">
           <h2
             id="emails"
-            className="text-xs font-medium text-zinc-500 uppercase"
+            className="text-xs font-medium text-zinc-500 uppercase dark:text-zinc-400"
           >
             Email history
           </h2>
@@ -109,7 +109,10 @@ export default async function InvoicePage({
                 </span>{" "}
                 to {log.to} on {formatTimestamp(log.createdAt)}
                 {log.error && (
-                  <span className="text-zinc-500"> · {log.error}</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">
+                    {" "}
+                    · {log.error}
+                  </span>
                 )}
               </li>
             ))}

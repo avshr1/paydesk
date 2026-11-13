@@ -117,7 +117,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="mx-auto w-full max-w-5xl px-6 py-8 text-sm text-zinc-500">
+      <footer className="mx-auto w-full max-w-5xl px-6 py-8 text-sm text-zinc-500 dark:text-zinc-400">
         Payments run in Stripe test mode. No real money moves.
       </footer>
     </div>

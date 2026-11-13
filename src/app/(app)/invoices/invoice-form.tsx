@@ -169,7 +169,7 @@ export function InvoiceForm({
 
       <fieldset className="flex flex-col gap-3">
         <legend className="mb-3 text-sm font-medium">Line items</legend>
-        <div className="hidden grid-cols-[1fr_6rem_8rem_7rem_2rem] gap-3 text-xs text-zinc-500 sm:grid">
+        <div className="hidden grid-cols-[1fr_6rem_8rem_7rem_2rem] gap-3 text-xs text-zinc-500 sm:grid dark:text-zinc-400">
           <span>Description</span>
           <span>Qty</span>
           <span>Unit price</span>
@@ -233,7 +233,7 @@ export function InvoiceForm({
                 }
                 disabled={rows.length === 1}
                 aria-label={`Remove line ${index + 1}`}
-                className="self-center rounded p-1 text-zinc-500 hover:text-red-600 disabled:opacity-30"
+                className="self-center rounded p-1 text-zinc-500 hover:text-red-600 disabled:opacity-30 dark:text-zinc-400"
               >
                 ✕
               </button>
