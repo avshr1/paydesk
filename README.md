@@ -84,8 +84,11 @@ npm install
 cp .env.example .env        # then fill in the values
 docker compose up -d        # start local Postgres
 npx prisma migrate dev      # create the database tables
+npm run db:seed             # optional: demo account with sample data
 npm run dev                 # http://localhost:3000
 ```
+
+The seed creates `demo@paydesk.test` (password `demo-password`) with clients and invoices in every status. It only runs against a local database.
 
 In a second terminal, forward Stripe webhooks to your local server:
 
