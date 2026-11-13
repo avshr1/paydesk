@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requireUserId } from "@/lib/session";
+import { assertId } from "@/lib/validation/id";
 import { clientSchema } from "@/lib/validation/client";
 
 const fields = ["name", "email", "company", "address", "notes"] as const;
@@ -44,6 +45,7 @@ export async function updateClient(
   _prev: ClientFormState,
   formData: FormData,
 ): Promise<ClientFormState> {
+  assertId(clientId);
   const userId = await requireUserId();
   const values = readForm(formData);
 
@@ -67,6 +69,7 @@ export async function updateClient(
 // Clients with invoices are archived instead of deleted, so financial records
 // stay complete. See docs/decisions.md #5.
 export async function removeClient(clientId: string) {
+  assertId(clientId);
   const userId = await requireUserId();
 
   const client = await db.client.findFirst({
@@ -89,6 +92,7 @@ export async function removeClient(clientId: string) {
 }
 
 export async function restoreClient(clientId: string) {
+  assertId(clientId);
   const userId = await requireUserId();
 
   const { count } = await db.client.updateMany({

@@ -14,6 +14,7 @@ import { deliverInvoice } from "@/lib/invoice-delivery";
 import { isEditable } from "@/lib/invoice-status";
 import { calculateTotals } from "@/lib/money";
 import { requireUserId } from "@/lib/session";
+import { assertId } from "@/lib/validation/id";
 import { invoiceSchema, type InvoiceInput } from "@/lib/validation/invoice";
 
 export type LineItemValues = {
@@ -176,6 +177,7 @@ export async function updateInvoice(
   _prev: InvoiceFormState,
   formData: FormData,
 ): Promise<InvoiceFormState> {
+  assertId(invoiceId);
   const userId = await requireUserId();
   const values = readForm(formData);
 
@@ -214,6 +216,7 @@ export async function updateInvoice(
 }
 
 export async function deleteInvoice(invoiceId: string) {
+  assertId(invoiceId);
   const userId = await requireUserId();
 
   const { count } = await db.invoice.deleteMany({
@@ -230,6 +233,7 @@ export type SendInvoiceState = { error?: string };
 export async function sendInvoice(
   invoiceId: string,
 ): Promise<SendInvoiceState> {
+  assertId(invoiceId);
   const userId = await requireUserId();
 
   const result = await deliverInvoice(userId, invoiceId);
