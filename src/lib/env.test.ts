@@ -33,6 +33,12 @@ describe("parseEnv", () => {
     expect(env.APP_URL).toBe("https://my-domain.example");
   });
 
+  it("rejects a live Stripe key", () => {
+    expect(() =>
+      parseEnv({ ...valid, STRIPE_SECRET_KEY: "sk_live_abc123" }),
+    ).toThrow(/STRIPE_SECRET_KEY: Use a Stripe test-mode key/);
+  });
+
   it("rejects a missing DATABASE_URL", () => {
     expect(() => parseEnv({})).toThrow(/DATABASE_URL/);
   });

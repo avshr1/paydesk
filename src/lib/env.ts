@@ -15,6 +15,12 @@ const envSchema = z.object({
   // Email via Resend (resend.com). Optional until Phase 4 is set up.
   RESEND_API_KEY: z.string().startsWith("re_").optional(),
   EMAIL_FROM: z.string().min(3).optional(),
+  // Stripe. Test-mode keys only: this project never takes real payments.
+  STRIPE_SECRET_KEY: z
+    .string()
+    .startsWith("sk_test_", "Use a Stripe test-mode key (sk_test_...)")
+    .optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().startsWith("whsec_").optional(),
   // Protects /api/cron/overdue. Vercel Cron sends it automatically.
   CRON_SECRET: z.string().min(16).optional(),
 });
