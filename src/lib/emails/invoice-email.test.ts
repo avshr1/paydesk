@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { buildInvoiceEmail, escapeHtml } from "@/lib/emails/invoice-email";
+import {
+  buildInvoiceEmail,
+  buildReminderEmail,
+  escapeHtml,
+} from "@/lib/emails/invoice-email";
 
 const input = {
   invoiceNumber: "INV-0042",
@@ -33,6 +37,36 @@ describe("buildInvoiceEmail", () => {
     expect(email.html).toContain(
       "&lt;img src=x onerror=&quot;alert(1)&quot;&gt;",
     );
+  });
+});
+
+describe("buildReminderEmail", () => {
+  it("says how late the invoice is and links to it", () => {
+    const email = buildReminderEmail({ ...input, daysOverdue: 5 });
+
+    expect(email.subject).toBe("Reminder: invoice INV-0042 is overdue");
+    expect(email.text).toContain("is now 5 days overdue");
+    for (const part of [email.text, email.html]) {
+      expect(part).toContain("$941.78");
+      expect(part).toContain(input.link);
+    }
+    expect(email.html).toContain("<strong>INV-0042</strong>");
+  });
+
+  it("uses the singular for one day", () => {
+    expect(buildReminderEmail({ ...input, daysOverdue: 1 }).text).toContain(
+      "now 1 day overdue",
+    );
+  });
+
+  it("escapes a sender name that contains HTML", () => {
+    const email = buildReminderEmail({
+      ...input,
+      senderName: "<script>x</script>",
+      daysOverdue: 3,
+    });
+
+    expect(email.html).not.toContain("<script>");
   });
 });
 
