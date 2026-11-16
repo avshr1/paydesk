@@ -67,3 +67,5 @@ export const sendEmail = createEmailSender({
   apiKey: env.RESEND_API_KEY,
   from: env.EMAIL_FROM,
 });
+
+export const isEmailConfigured = Boolean(env.RESEND_API_KEY && env.EMAIL_FROM);
