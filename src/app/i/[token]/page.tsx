@@ -5,6 +5,8 @@ import { StatusBadge } from "@/components/status-badge";
 import { formatDate } from "@/lib/dates";
 import { getPublicInvoice } from "@/lib/invoices";
 import { formatCents } from "@/lib/money";
+import { payInvoice } from "./actions";
+import { PayButton } from "./pay-button";
 
 export const metadata: Metadata = {
   title: "Invoice",
@@ -14,16 +16,28 @@ export const metadata: Metadata = {
 
 export default async function PublicInvoicePage({
   params,
+  searchParams,
 }: PageProps<"/i/[token]">) {
-  const { token } = await params;
+  const [{ token }, { payment }] = await Promise.all([params, searchParams]);
 
   const invoice = await getPublicInvoice(token);
   if (!invoice) notFound();
 
   const sender = invoice.user.name ?? invoice.user.email;
+  const total = formatCents(invoice.totalCents, invoice.currency);
+  const cancelled = payment === "cancelled" && invoice.status !== "PAID";
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-12">
+      {cancelled && (
+        <p
+          role="status"
+          className="rounded-lg bg-zinc-100 px-4 py-3 text-sm dark:bg-zinc-900"
+        >
+          Payment cancelled. You haven&apos;t been charged, and you can pay
+          whenever you&apos;re ready.
+        </p>
+      )}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-2">
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -44,16 +58,19 @@ export default async function PublicInvoicePage({
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
             {invoice.status === "PAID" ? "Paid" : "Amount due"}
           </p>
-          <p className="text-2xl font-semibold tabular-nums">
-            {formatCents(invoice.totalCents, invoice.currency)}
-          </p>
-          <a
-            href={`/i/${token}/pdf`}
-            download
-            className="mt-2 inline-block text-sm font-medium underline"
-          >
-            Download PDF
-          </a>
+          <p className="text-2xl font-semibold tabular-nums">{total}</p>
+          <div className="mt-3 flex flex-col items-end gap-2">
+            {invoice.status !== "PAID" && (
+              <PayButton action={payInvoice.bind(null, token)} amount={total} />
+            )}
+            <a
+              href={`/i/${token}/pdf`}
+              download
+              className="text-sm font-medium underline"
+            >
+              Download PDF
+            </a>
+          </div>
         </div>
       </div>
 
