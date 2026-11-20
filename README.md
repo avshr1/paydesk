@@ -2,13 +2,24 @@
 
 **Paydesk** is a full-stack invoicing and payments app where freelancers manage clients, create invoices, email them, and get paid online through Stripe. Clients pay from a public link without creating an account.
 
-> 🚧 **Status:** In active development, built in phases. See the [roadmap](#roadmap) for progress.
->
 > 🔗 **Live demo:** [paydesk-theta.vercel.app](https://paydesk-theta.vercel.app) · Payments run in **Stripe test mode**, so no real money moves.
+>
+> 🚧 **Status:** All features are built and tested. On the live demo, sending email and taking payments switch on once their service keys are added; see the [roadmap](#roadmap).
 
 [![CI](https://github.com/avshr1/paydesk/actions/workflows/ci.yml/badge.svg)](https://github.com/avshr1/paydesk/actions/workflows/ci.yml)
 
 ---
+
+## Screenshots
+
+|                                                                                 |                                                                               |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![Dashboard with totals and revenue chart](docs/screenshots/dashboard.png)      | ![Invoice list with status filters](docs/screenshots/invoices.png)            |
+| **Dashboard:** paid, outstanding, and overdue totals, plus 12 months of revenue | **Invoices:** every invoice, filterable by status                             |
+| ![New invoice form with line items](docs/screenshots/new-invoice.png)           | ![What the client sees, with a Pay button](docs/screenshots/client-view.png)  |
+| **New invoice:** line items and tax, with a live total                          | **Client view:** the private link the client opens to view, download, and pay |
+
+Screenshots are generated from demo data with `npm run screenshots`.
 
 ## Features
 
@@ -47,6 +58,24 @@ These are the decisions I'd point to in this codebase:
 - **Public links are unguessable.** Invoice pages use a cryptographically random token, not the database ID.
 - **Financial records can't be silently deleted.** Clients with invoices are archived instead of deleted, and sent invoices are locked from editing.
 - **Every input is validated.** Zod schemas guard all forms, Server Actions, route handlers, and environment variables.
+- **Reminders can't double-send.** The daily job claims each reminder in the database before emailing, so overlapping runs skip it; a failed email undoes its claim and is retried the next day.
+- **No real money by accident.** Only Stripe test-mode keys are accepted, and the scheduled job only runs with its secret.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    F["Freelancer"] -->|"logs in, manages clients & invoices"| App
+    C["Client"] -->|"opens private link /i/token"| App
+    C -->|"pays by card"| Stripe
+    App["Next.js on Vercel<br/>pages · Server Actions · route handlers"] -->|"reads & writes via Prisma"| DB[("Postgres")]
+    App -->|"invoice & reminder emails"| Resend
+    App -->|"creates Checkout session"| Stripe
+    Stripe -->|"signed webhook: mark paid"| App
+    Cron["Vercel Cron, daily"] -->|"Bearer CRON_SECRET"| App
+```
+
+Everything runs in one Next.js app. Freelancer pages require login; the client's invoice page, PDF, and Pay button are reached only through an unguessable link. Totals, ownership, and payment status are always decided on the server.
 
 ## Data Model
 
@@ -100,38 +129,44 @@ Pay test invoices with card `4242 4242 4242 4242`, any future expiry date, and a
 
 ### Environment Variables
 
-| Variable                                | Purpose                                          |
-| --------------------------------------- | ------------------------------------------------ |
-| `DATABASE_URL`                          | Pooled Postgres connection string                |
-| `DIRECT_URL`                            | Direct Postgres connection (used for migrations) |
-| `AUTH_SECRET`                           | Secret for signing Auth.js tokens                |
-| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth credentials                         |
-| `STRIPE_SECRET_KEY`                     | Stripe API key (test mode)                       |
-| `STRIPE_WEBHOOK_SECRET`                 | Used to verify webhook signatures                |
-| `RESEND_API_KEY`                        | Sends transactional email                        |
-| `EMAIL_FROM`                            | Sender address for invoices                      |
-| `CRON_SECRET`                           | Protects the overdue-reminder endpoint           |
-| `APP_URL`                               | Base URL used in emailed links                   |
+| Variable                                | Purpose                                                                   |
+| --------------------------------------- | ------------------------------------------------------------------------- |
+| `DATABASE_URL`                          | Pooled Postgres connection string                                         |
+| `DIRECT_URL`                            | Direct Postgres connection (used for migrations)                          |
+| `AUTH_SECRET`                           | Secret for signing Auth.js tokens                                         |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | Google OAuth credentials                                                  |
+| `STRIPE_SECRET_KEY`                     | Stripe API key (test mode only; live keys are rejected)                   |
+| `STRIPE_WEBHOOK_SECRET`                 | Used to verify webhook signatures                                         |
+| `RESEND_API_KEY`                        | Sends transactional email                                                 |
+| `EMAIL_FROM`                            | Sender address for invoices                                               |
+| `CRON_SECRET`                           | Protects the overdue-reminder endpoint                                    |
+| `APP_URL`                               | Base URL used in emailed links (defaults to the Vercel production domain) |
+
+Only `DATABASE_URL` is required. Each feature that needs a service key explains that it isn't set up yet instead of failing.
 
 ## Testing
 
 ```bash
-npm run test        # Vitest unit tests (invoice math, webhook handling)
-npm run test:e2e    # Playwright end-to-end tests
+npm run test        # Vitest unit tests: money math, webhooks, reminders, validation
+npm run build       # end-to-end tests run against a production build
+npm run test:e2e    # Playwright: sign-up → client → invoice → PDF, redirects,
+                    # and axe accessibility checks in light and dark mode
 ```
+
+CI runs lint, typecheck, formatting, unit tests, migrations, the build, and the end-to-end tests against Postgres 17 on every push.
 
 ## Roadmap
 
 - [x] **Phase 0:** Project setup, CI, and first deploy
-- [ ] **Phase 1:** Authentication
+- [ ] **Phase 1:** Authentication (email/password live; Google login built, needs OAuth keys)
 - [x] **Phase 2:** Client management
 - [x] **Phase 3:** Invoices and total calculations
-- [ ] **Phase 4:** Email delivery and public invoice page
-- [ ] **Phase 5:** Stripe payments and webhooks
+- [ ] **Phase 4:** Email delivery and public invoice page (built; needs a Resend key)
+- [ ] **Phase 5:** Stripe payments and webhooks (built; needs Stripe test keys)
 - [x] **Phase 6:** PDF export
 - [x] **Phase 7:** Dashboard and revenue chart
-- [ ] **Phase 8:** Overdue reminders
-- [ ] **Phase 9:** End-to-end tests and polish
+- [ ] **Phase 8:** Overdue reminders (built; needs `CRON_SECRET` and email)
+- [ ] **Phase 9:** End-to-end tests and polish (payment and email journeys need the keys above)
 
 ### Future Ideas
 
