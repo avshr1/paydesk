@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { axisLabel, niceAxis } from "@/lib/chart-axis";
 import { formatCents } from "@/lib/money";
 import type { MonthRevenue } from "@/lib/revenue";
 
@@ -8,23 +9,6 @@ const HEIGHT = 220;
 const MARGIN = { top: 12, right: 8, bottom: 28, left: 56 };
 const MAX_BAR = 24;
 const RADIUS = 4;
-
-// Rounds the axis maximum up to 1, 2, or 5 × a power of ten (in cents).
-function niceMax(cents: number): number {
-  if (cents <= 0) return 10_000;
-  const rough = cents / 4;
-  const magnitude = 10 ** Math.floor(Math.log10(rough));
-  const step =
-    [1, 2, 5, 10].map((m) => m * magnitude).find((s) => s >= rough) ?? rough;
-  return Math.ceil(cents / step) * step;
-}
-
-function axisLabel(cents: number): string {
-  const dollars = cents / 100;
-  return dollars >= 1000
-    ? `$${(dollars / 1000).toLocaleString("en-US", { maximumFractionDigits: 1 })}k`
-    : `$${dollars.toLocaleString("en-US")}`;
-}
 
 // A bar with a 4px rounded top and a square base on the baseline.
 function barPath(x: number, y: number, width: number, height: number) {
@@ -49,8 +33,9 @@ export function RevenueChart({ months }: { months: MonthRevenue[] }) {
   }, []);
 
   const total = months.reduce((sum, month) => sum + month.cents, 0);
-  const max = niceMax(Math.max(...months.map((month) => month.cents)));
-  const ticks = [0, 0.25, 0.5, 0.75, 1].map((t) => Math.round(max * t));
+  const { max, ticks } = niceAxis(
+    Math.max(...months.map((month) => month.cents)),
+  );
 
   const plotWidth = Math.max(width - MARGIN.left - MARGIN.right, 0);
   const plotHeight = HEIGHT - MARGIN.top - MARGIN.bottom;
