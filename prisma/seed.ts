@@ -215,8 +215,11 @@ async function main() {
   const now = new Date();
 
   try {
-    // Replace only the demo account. Invoices first: clients with invoices
-    // can't be deleted (decisions.md #5).
+    // Replace only the demo account, children first: payments and invoices
+    // protect the records above them from deletion (decisions.md #5). The
+    // demo's payments are sample data, so clearing them is safe here.
+    const demoInvoices = { invoice: { user: { email: DEMO_EMAIL } } };
+    await db.payment.deleteMany({ where: demoInvoices });
     await db.invoice.deleteMany({ where: { user: { email: DEMO_EMAIL } } });
     await db.user.deleteMany({ where: { email: DEMO_EMAIL } });
 
