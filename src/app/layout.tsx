@@ -24,7 +24,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {/* Lets keyboard users jump past the navigation. Hidden until focused. */}
+        <a
+          href="#main"
+          className="sr-only rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 dark:bg-zinc-100 dark:text-zinc-900"
+        >
+          Skip to content
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

@@ -23,7 +23,11 @@ export default async function PaymentSuccessPage({
   const sender = invoice.user.name ?? invoice.user.email;
 
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-3 px-6 py-24 text-center">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-3 px-6 py-24 text-center outline-none"
+    >
       <h1 className="text-2xl font-semibold">
         {confirmed ? "Payment received" : "Payment processing"}
       </h1>

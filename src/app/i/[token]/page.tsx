@@ -28,7 +28,11 @@ export default async function PublicInvoicePage({
   const cancelled = payment === "cancelled" && invoice.status !== "PAID";
 
   return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-12">
+    <main
+      id="main"
+      tabIndex={-1}
+      className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-12 outline-none"
+    >
       {cancelled && (
         <p
           role="status"

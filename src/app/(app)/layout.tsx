@@ -49,7 +49,11 @@ export default async function AppLayout({
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto w-full max-w-5xl flex-1 px-6 py-10 outline-none"
+      >
         {children}
       </main>
     </div>

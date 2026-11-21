@@ -90,7 +90,7 @@ export function RevenueChart({ months }: { months: MonthRevenue[] }) {
                 onPointerLeave={() => setActive(null)}
                 onFocus={() => setActive(index)}
                 onBlur={() => setActive(null)}
-                className="outline-none"
+                className="rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 dark:focus-visible:outline-zinc-100"
               >
                 {/* The whole column is the hover target, not just the bar. */}
                 <rect

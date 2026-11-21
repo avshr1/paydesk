@@ -47,7 +47,11 @@ export default function Home() {
         </nav>
       </header>
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-20 px-6 py-16">
+      <main
+        id="main"
+        tabIndex={-1}
+        className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-20 px-6 py-16 outline-none"
+      >
         <section className="flex max-w-2xl flex-col gap-6">
           <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
             In development · online payments coming soon
