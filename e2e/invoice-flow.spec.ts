@@ -54,7 +54,7 @@ test("sign up, add a client, create an invoice, and try to send it", async ({
     await page.getByRole("button", { name: "Create invoice" }).click();
 
     // The server's own totals, after saving.
-    await expect(page).toHaveURL(/\/invoices\/[^/]+$/);
+    await expect(page).toHaveURL(/\/invoices\/(?!new$)[^/]+$/);
     await expect(page.getByRole("heading", { name: "INV-0001" })).toBeVisible();
     await expect(page.getByText("Draft", { exact: true })).toBeVisible();
     await expect(page.getByText("$941.78")).toBeVisible();

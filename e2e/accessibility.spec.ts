@@ -52,7 +52,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       await page.getByLabel("Line 1 description").fill("Design work");
       await page.getByLabel("Line 1 unit price").fill("100");
       await page.getByRole("button", { name: "Create invoice" }).click();
-      await expect(page).toHaveURL(/\/invoices\/[^/]+$/);
+      await expect(page).toHaveURL(/\/invoices\/(?!new$)[^/]+$/);
       await expectNoViolations(page);
 
       await page.goto("/invoices");
