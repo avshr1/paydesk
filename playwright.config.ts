@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { E2E_WEBHOOK_SECRET } from "./e2e/constants";
 
 const PORT = 3100;
 
@@ -26,6 +27,8 @@ export default defineConfig({
       AUTH_SECRET:
         process.env.AUTH_SECRET ??
         "e2e-only-secret-not-used-anywhere-else-0000",
+      // Lets e2e/payment.spec.ts sign webhooks the way Stripe does.
+      STRIPE_WEBHOOK_SECRET: E2E_WEBHOOK_SECRET,
     },
   },
 });
