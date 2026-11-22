@@ -18,6 +18,19 @@ export function getInvoice(userId: string, invoiceId: string) {
       client: true,
       lineItems: { orderBy: { position: "asc" } },
       emailLogs: { orderBy: { createdAt: "desc" } },
+      payments: { orderBy: { createdAt: "desc" } },
+    },
+  });
+}
+
+// Just what the invoice document itself shows (the PDF), without the
+// email and payment history the invoice page adds.
+export function getInvoiceDocument(userId: string, invoiceId: string) {
+  return db.invoice.findFirst({
+    where: { id: invoiceId, userId },
+    include: {
+      client: true,
+      lineItems: { orderBy: { position: "asc" } },
     },
   });
 }

@@ -9,6 +9,7 @@ import { formatDate, formatTimestamp } from "@/lib/dates";
 import { publicInvoiceUrl } from "@/lib/invoice-delivery";
 import { isEditable } from "@/lib/invoice-status";
 import { getInvoice } from "@/lib/invoices";
+import { formatCents } from "@/lib/money";
 import { requireUserId } from "@/lib/session";
 import { deleteInvoice, sendInvoice } from "../actions";
 import { SendInvoiceForm } from "./send-invoice-form";
@@ -84,6 +85,36 @@ export default async function InvoicePage({
             </code>
             <CopyButton value={publicInvoiceUrl(invoice.publicToken)} />
           </div>
+        </section>
+      )}
+
+      {invoice.payments.length > 0 && (
+        <section aria-labelledby="payments" className="flex flex-col gap-2">
+          <h2
+            id="payments"
+            className="text-xs font-medium text-zinc-500 uppercase dark:text-zinc-400"
+          >
+            Payments
+          </h2>
+          <ul className="flex flex-col gap-1 text-sm">
+            {invoice.payments.map((payment) => (
+              <li key={payment.id}>
+                <span className="font-medium tabular-nums">
+                  {formatCents(payment.amountCents, invoice.currency)}
+                </span>{" "}
+                paid by card on {formatTimestamp(payment.createdAt)}
+                {/* The webhook only marks an invoice paid when the amount
+                    matches; flag any payment that didn't, so it gets noticed. */}
+                {payment.amountCents !== invoice.totalCents && (
+                  <span className="text-red-600 dark:text-red-400">
+                    {" "}
+                    · doesn&apos;t match the invoice total of{" "}
+                    {formatCents(invoice.totalCents, invoice.currency)}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
         </section>
       )}
 

@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { getInvoice } from "@/lib/invoices";
+import { getInvoiceDocument } from "@/lib/invoices";
 import { invoicePdfResponse, notFoundResponse } from "@/lib/pdf/response";
 
 // The freelancer's download. Someone else's invoice looks exactly like one
@@ -16,7 +16,7 @@ export async function GET(
 
   const { id } = await params;
   const [invoice, user] = await Promise.all([
-    getInvoice(userId, id),
+    getInvoiceDocument(userId, id),
     db.user.findUnique({
       where: { id: userId },
       select: { name: true, email: true },
