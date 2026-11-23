@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   buildInvoiceEmail,
+  buildPaidNotificationEmail,
+  buildReceiptEmail,
   buildReminderEmail,
   escapeHtml,
 } from "@/lib/emails/invoice-email";
@@ -67,6 +69,47 @@ describe("buildReminderEmail", () => {
     });
 
     expect(email.html).not.toContain("<script>");
+  });
+});
+
+describe("buildReceiptEmail", () => {
+  const paidAt = new Date("2026-11-20T15:00:00Z");
+
+  it("confirms the amount paid to the client", () => {
+    const email = buildReceiptEmail({ ...input, paidAt });
+
+    expect(email.subject).toBe("Receipt: invoice INV-0042 is paid");
+    expect(email.text).toMatch(/^Hi Grace Hopper,/);
+    expect(email.text).toContain("Amount paid: $941.78 on Nov 20, 2026");
+    expect(email.html).toContain("Amount paid");
+    expect(email.html).not.toContain("Amount due");
+  });
+});
+
+describe("buildPaidNotificationEmail", () => {
+  const paidAt = new Date("2026-11-20T15:00:00Z");
+
+  it("tells the freelancer who paid and how much", () => {
+    const email = buildPaidNotificationEmail({
+      ...input,
+      link: "https://paydesk.example/invoices/inv_1",
+      paidAt,
+    });
+
+    expect(email.subject).toBe("You got paid: INV-0042 ($941.78)");
+    expect(email.text).toMatch(/^Hi Ada Lovelace,/);
+    expect(email.text).toContain("Grace Hopper paid invoice INV-0042");
+    expect(email.html).toContain("https://paydesk.example/invoices/inv_1");
+  });
+
+  it("escapes a client name that contains HTML", () => {
+    const email = buildPaidNotificationEmail({
+      ...input,
+      clientName: "<b>Evil</b>",
+      paidAt,
+    });
+
+    expect(email.html).not.toContain("<b>Evil</b>");
   });
 });
 
