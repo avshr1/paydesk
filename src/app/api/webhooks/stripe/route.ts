@@ -1,5 +1,7 @@
+import { after } from "next/server";
 import Stripe from "stripe";
 import { env } from "@/lib/env";
+import { sendPaymentEmails } from "@/lib/payment-emails";
 import { handleStripeEvent } from "@/lib/payments";
 
 // Only used to verify signatures, which needs no API key.
@@ -32,5 +34,20 @@ export async function POST(request: Request) {
 
   // Any error here returns 500, and Stripe retries the event later.
   const outcome = await handleStripeEvent(event);
+
+  // Only the event that actually marked the invoice paid sends emails, so a
+  // repeated event never sends them twice. They go out after the response,
+  // so Stripe gets its answer immediately.
+  if (outcome === "paid" && event.type === "checkout.session.completed") {
+    const invoiceId = event.data.object.metadata?.invoiceId;
+    if (invoiceId) {
+      after(() =>
+        sendPaymentEmails(invoiceId).catch((error: unknown) =>
+          console.error(`Payment emails for ${invoiceId} failed`, error),
+        ),
+      );
+    }
+  }
+
   return Response.json({ received: true, outcome });
 }

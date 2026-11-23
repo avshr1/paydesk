@@ -51,7 +51,7 @@ describe("handleStripeEvent", () => {
   });
 
   it("records the payment and marks the invoice paid", async () => {
-    expect(await handleStripeEvent(completed())).toBe("processed");
+    expect(await handleStripeEvent(completed())).toBe("paid");
 
     expect(tx.stripeEvent.createMany).toHaveBeenCalledWith({
       data: { id: "evt_1", type: "checkout.session.completed" },
@@ -87,6 +87,13 @@ describe("handleStripeEvent", () => {
     );
     expect(tx.payment.create).toHaveBeenCalled();
     expect(tx.invoice.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("records a second payment but reports the invoice was already paid", async () => {
+    tx.invoice.updateMany.mockResolvedValue({ count: 0 });
+
+    expect(await handleStripeEvent(completed())).toBe("processed");
+    expect(tx.payment.create).toHaveBeenCalled();
   });
 
   it("ignores other event types and unpaid sessions", async () => {

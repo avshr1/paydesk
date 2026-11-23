@@ -6,6 +6,8 @@ const SECRET = "whsec_test_secret_for_unit_tests";
 const mocks = vi.hoisted(() => ({
   secret: "whsec_test_secret_for_unit_tests" as string | undefined,
   handleStripeEvent: vi.fn(),
+  sendPaymentEmails: vi.fn(),
+  afterCallbacks: [] as (() => unknown)[],
 }));
 
 vi.mock("@/lib/env", () => ({
@@ -18,6 +20,13 @@ vi.mock("@/lib/env", () => ({
 vi.mock("@/lib/payments", () => ({
   handleStripeEvent: mocks.handleStripeEvent,
 }));
+vi.mock("@/lib/payment-emails", () => ({
+  sendPaymentEmails: mocks.sendPaymentEmails,
+}));
+// Collects after() callbacks so tests can run them once the response is built.
+vi.mock("next/server", () => ({
+  after: (callback: () => unknown) => mocks.afterCallbacks.push(callback),
+}));
 
 const { POST } = await import("./route");
 
@@ -25,7 +34,13 @@ const payload = JSON.stringify({
   id: "evt_123",
   object: "event",
   type: "checkout.session.completed",
-  data: { object: { id: "cs_123", object: "checkout.session" } },
+  data: {
+    object: {
+      id: "cs_123",
+      object: "checkout.session",
+      metadata: { invoiceId: "inv_123" },
+    },
+  },
 });
 
 // Signed exactly the way Stripe signs real webhooks.
@@ -46,7 +61,31 @@ describe("POST /api/webhooks/stripe", () => {
     vi.clearAllMocks();
     mocks.secret = SECRET;
     mocks.handleStripeEvent.mockResolvedValue("processed");
+    mocks.sendPaymentEmails.mockResolvedValue(undefined);
+    mocks.afterCallbacks.length = 0;
   });
+
+  it("sends payment emails after responding, when the invoice was marked paid", async () => {
+    mocks.handleStripeEvent.mockResolvedValue("paid");
+
+    const res = await POST(post(payload, signed(payload)));
+
+    expect(res.status).toBe(200);
+    expect(mocks.sendPaymentEmails).not.toHaveBeenCalled();
+    await Promise.all(mocks.afterCallbacks.map((callback) => callback()));
+    expect(mocks.sendPaymentEmails).toHaveBeenCalledWith("inv_123");
+  });
+
+  it.each(["processed", "duplicate", "ignored"])(
+    "sends no emails when the outcome is %s",
+    async (outcome) => {
+      mocks.handleStripeEvent.mockResolvedValue(outcome);
+
+      await POST(post(payload, signed(payload)));
+
+      expect(mocks.afterCallbacks).toHaveLength(0);
+    },
+  );
 
   it("accepts a correctly signed event and handles it", async () => {
     const res = await POST(post(payload, signed(payload)));

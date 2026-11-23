@@ -80,7 +80,7 @@ test("a paid Checkout session marks the invoice paid everywhere", async ({
 
   await test.step("Stripe's webhook marks it paid, exactly once", async () => {
     expect(await (await deliver()).json()).toMatchObject({
-      outcome: "processed",
+      outcome: "paid",
     });
     // Stripe may deliver the same event twice.
     expect(await (await deliver()).json()).toMatchObject({

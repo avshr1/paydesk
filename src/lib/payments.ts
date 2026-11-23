@@ -2,7 +2,9 @@ import type Stripe from "stripe";
 import { InvoiceStatus } from "@/generated/prisma/enums";
 import { db } from "@/lib/db";
 
-export type EventOutcome = "processed" | "duplicate" | "ignored";
+// "paid": this event marked an invoice paid. "processed": a payment was
+// recorded but the invoice didn't change (wrong amount, or already paid).
+export type EventOutcome = "paid" | "processed" | "duplicate" | "ignored";
 
 // Handles a webhook event whose signature has already been verified.
 //
@@ -62,7 +64,7 @@ export async function handleStripeEvent(
       return "processed";
     }
 
-    await tx.invoice.updateMany({
+    const marked = await tx.invoice.updateMany({
       where: {
         id: invoice.id,
         status: { in: [InvoiceStatus.SENT, InvoiceStatus.OVERDUE] },
@@ -72,6 +74,6 @@ export async function handleStripeEvent(
         paidAt: new Date(event.created * 1000),
       },
     });
-    return "processed";
+    return marked.count === 1 ? "paid" : "processed";
   });
 }
