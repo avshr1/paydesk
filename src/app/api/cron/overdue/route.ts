@@ -1,5 +1,6 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { env } from "@/lib/env";
+import { pruneLoginAttempts } from "@/lib/login-throttle";
 import { runOverdueJob } from "@/lib/overdue-job";
 
 // Compares hashes so the check takes the same time whatever is sent, and
@@ -23,6 +24,8 @@ export async function GET(request: Request) {
   }
 
   const result = await runOverdueJob();
-  console.log("Overdue job finished", result);
-  return Response.json(result);
+  // Daily housekeeping: failed-login records only matter for 15 minutes.
+  const loginAttemptsPruned = await pruneLoginAttempts();
+  console.log("Daily job finished", { ...result, loginAttemptsPruned });
+  return Response.json({ ...result, loginAttemptsPruned });
 }

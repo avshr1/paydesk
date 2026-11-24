@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   secret: "a-long-test-secret-0123456789" as string | undefined,
   runOverdueJob: vi.fn(),
+  pruneLoginAttempts: vi.fn(),
 }));
 
 vi.mock("@/lib/env", () => ({
@@ -13,6 +14,9 @@ vi.mock("@/lib/env", () => ({
   },
 }));
 vi.mock("@/lib/overdue-job", () => ({ runOverdueJob: mocks.runOverdueJob }));
+vi.mock("@/lib/login-throttle", () => ({
+  pruneLoginAttempts: mocks.pruneLoginAttempts,
+}));
 
 const { GET } = await import("./route");
 
@@ -27,14 +31,19 @@ describe("GET /api/cron/overdue", () => {
     vi.clearAllMocks();
     mocks.secret = "a-long-test-secret-0123456789";
     mocks.runOverdueJob.mockResolvedValue({ markedOverdue: 0 });
+    mocks.pruneLoginAttempts.mockResolvedValue(4);
     vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
-  it("runs the job with the right secret", async () => {
+  it("runs the job and prunes old login attempts with the right secret", async () => {
     const res = await GET(request("Bearer a-long-test-secret-0123456789"));
 
     expect(res.status).toBe(200);
     expect(mocks.runOverdueJob).toHaveBeenCalledOnce();
+    expect(await res.json()).toEqual({
+      markedOverdue: 0,
+      loginAttemptsPruned: 4,
+    });
   });
 
   it.each([
