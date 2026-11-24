@@ -134,3 +134,13 @@ model StripeEvent {
   type        String
   processedAt DateTime @default(now())
 }
+
+// Failed password logins, for throttling brute-force guessing. Old rows are
+// pruned by the daily job.
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  createdAt DateTime @default(now())
+
+  @@index([email, createdAt])
+}
