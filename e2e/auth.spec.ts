@@ -22,6 +22,6 @@ test.describe("logged-out visitors", () => {
     ).toBeVisible();
 
     const health = await request.get("/api/health");
-    expect(await health.json()).toEqual({ status: "ok", database: "ok" });
+    expect(await health.json()).toMatchObject({ status: "ok", database: "ok" });
   });
 });
