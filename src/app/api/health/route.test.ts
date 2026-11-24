@@ -28,7 +28,7 @@ describe("GET /api/health", () => {
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({
       status: "error",
-      database: "unreachable",
+      database: "unavailable",
     });
   });
 });
