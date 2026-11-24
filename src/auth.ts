@@ -2,8 +2,10 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import type { Provider } from "next-auth/providers";
+import { TooManyAttempts } from "@/lib/auth-errors";
 import { db } from "@/lib/db";
 import { env } from "@/lib/env";
+import { isLoginThrottled, recordLoginFailure } from "@/lib/login-throttle";
 import { verifyPassword } from "@/lib/password";
 import { logInSchema } from "@/lib/validation/auth";
 
@@ -18,15 +20,20 @@ const providers: Provider[] = [
     async authorize(credentials) {
       const parsed = logInSchema.safeParse(credentials);
       if (!parsed.success) return null;
+      const { email, password } = parsed.data;
 
-      const user = await db.user.findUnique({
-        where: { email: parsed.data.email },
-      });
+      // Checked before the password, so a locked-out email can't keep guessing.
+      if (await isLoginThrottled(email)) throw new TooManyAttempts();
+
+      const user = await db.user.findUnique({ where: { email } });
       const valid = await verifyPassword(
-        parsed.data.password,
+        password,
         user?.passwordHash ?? DUMMY_HASH,
       );
-      if (!user?.passwordHash || !valid) return null;
+      if (!user?.passwordHash || !valid) {
+        await recordLoginFailure(email);
+        return null;
+      }
 
       return { id: user.id, email: user.email, name: user.name };
     },

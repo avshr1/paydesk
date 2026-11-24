@@ -3,8 +3,10 @@
 import { AuthError } from "next-auth";
 import { z } from "zod";
 import { signIn } from "@/auth";
+import { TooManyAttempts } from "@/lib/auth-errors";
 import { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
+import { WINDOW_MINUTES } from "@/lib/login-throttle";
 import { hashPassword } from "@/lib/password";
 import { logInSchema, signUpSchema } from "@/lib/validation/auth";
 
@@ -74,6 +76,12 @@ export async function logIn(
     // On success this throws a redirect, which must not be caught.
     await signIn("credentials", { ...parsed.data, redirectTo: "/dashboard" });
   } catch (error) {
+    if (error instanceof TooManyAttempts) {
+      return {
+        message: `Too many failed attempts. Try again in ${WINDOW_MINUTES} minutes.`,
+        values,
+      };
+    }
     if (error instanceof AuthError) {
       // Same message for an unknown email and a wrong password, so the form
       // doesn't reveal which emails have accounts.
