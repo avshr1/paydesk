@@ -59,6 +59,7 @@ These are the decisions I'd point to in this codebase:
 - **Financial records can't be silently deleted.** Clients with invoices are archived instead of deleted, and sent invoices are locked from editing.
 - **Every input is validated.** Zod schemas guard all forms, Server Actions, route handlers, and environment variables.
 - **Reminders can't double-send.** The daily job claims each reminder in the database before emailing, so overlapping runs skip it; a failed email undoes its claim and is retried the next day.
+- **Password guessing is throttled.** Five wrong passwords for an email within 15 minutes blocks further attempts. It applies equally to emails without accounts, so it reveals nothing about who has signed up.
 - **Usable without a mouse.** Every page passes automated WCAG 2.1 AA checks in light and dark mode, has a skip link and a main landmark, and shows a visible focus indicator at every Tab stop; CI checks all of this.
 - **No real money by accident.** Only Stripe test-mode keys are accepted, and the scheduled job only runs with its secret.
 
