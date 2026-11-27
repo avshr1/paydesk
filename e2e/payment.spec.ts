@@ -104,6 +104,10 @@ test("a paid Checkout session marks the invoice paid everywhere", async ({
     const payments = page.getByRole("region", { name: "Payments" });
     await expect(payments.getByRole("listitem")).toHaveCount(1);
     await expect(payments).toContainText("$750.00 paid by card");
+    // A card payment can't be undone from the page.
+    await expect(
+      page.getByRole("button", { name: "Mark as unpaid" }),
+    ).toHaveCount(0);
 
     await page.goto("/dashboard");
     await expect(page.getByText("$750.00").first()).toBeVisible();
