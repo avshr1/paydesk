@@ -11,7 +11,7 @@ import { isEditable } from "@/lib/invoice-status";
 import { getInvoice } from "@/lib/invoices";
 import { formatCents } from "@/lib/money";
 import { requireUserId } from "@/lib/session";
-import { deleteInvoice, sendInvoice } from "../actions";
+import { deleteInvoice, markPaid, markUnpaid, sendInvoice } from "../actions";
 import { SendInvoiceForm } from "./send-invoice-form";
 
 export const metadata: Metadata = { title: "Invoice · Paydesk" };
@@ -62,6 +62,27 @@ export default async function InvoicePage({
                 clientEmail={invoice.client.email}
               />
             </>
+          )}
+          {(invoice.status === "SENT" || invoice.status === "OVERDUE") && (
+            <form action={markPaid.bind(null, invoice.id)}>
+              <ConfirmButton
+                confirmMessage={`Mark ${invoice.number} as paid? Use this for payments received outside Paydesk, like a bank transfer.`}
+                className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 disabled:opacity-60 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              >
+                Mark as paid
+              </ConfirmButton>
+            </form>
+          )}
+          {/* Only a manual "paid" can be undone, never a card payment. */}
+          {invoice.status === "PAID" && invoice.payments.length === 0 && (
+            <form action={markUnpaid.bind(null, invoice.id)}>
+              <ConfirmButton
+                confirmMessage={`Mark ${invoice.number} as unpaid again?`}
+                className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium hover:bg-zinc-100 disabled:opacity-60 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              >
+                Mark as unpaid
+              </ConfirmButton>
+            </form>
           )}
         </div>
       </div>

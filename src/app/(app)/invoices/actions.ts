@@ -12,6 +12,7 @@ import {
 } from "@/lib/invoice-identifiers";
 import { deliverInvoice } from "@/lib/invoice-delivery";
 import { isEditable } from "@/lib/invoice-status";
+import { markInvoicePaid, markInvoiceUnpaid } from "@/lib/manual-payment";
 import { calculateTotals } from "@/lib/money";
 import { requireUserId } from "@/lib/session";
 import { assertId } from "@/lib/validation/id";
@@ -243,4 +244,29 @@ export async function sendInvoice(
   revalidatePath(`/invoices/${invoiceId}`);
   revalidatePath("/invoices");
   return result.status === "failed" ? { error: result.error } : {};
+}
+
+// Payments received outside Paydesk (bank transfer, check, cash).
+export async function markPaid(invoiceId: string) {
+  assertId(invoiceId);
+  const userId = await requireUserId();
+
+  if (!(await markInvoicePaid(userId, invoiceId))) notFound();
+
+  revalidatePath(`/invoices/${invoiceId}`);
+  revalidatePath("/invoices");
+  revalidatePath("/dashboard");
+}
+
+export async function markUnpaid(invoiceId: string) {
+  assertId(invoiceId);
+  const userId = await requireUserId();
+
+  // The page hides this when a card payment exists; "has_card_payment" is a
+  // no-op in case it's called anyway.
+  if ((await markInvoiceUnpaid(userId, invoiceId)) === "not_found") notFound();
+
+  revalidatePath(`/invoices/${invoiceId}`);
+  revalidatePath("/invoices");
+  revalidatePath("/dashboard");
 }
